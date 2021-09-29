@@ -5,7 +5,7 @@
 
 const int32_t INF = INT32_MAX;
 
-std::set<int> all_sums(std::set<int>& s, int k) {
+std::set<int> all_sums(std::set<int>& s, int k) { // make set of sums every element in set
     std::set<int> new_s = s, buffer;
     new_s.insert(0);
     for (int i = 0; i <= k; ++i) {
@@ -42,7 +42,7 @@ private:
         Dynamics() : ans(k + 1, INF) {}
     };
 
-    Dynamics sum(Dynamics &&first, Dynamics &&second) {
+    Dynamics sum(Dynamics &&first, Dynamics &&second) { // operation '+'
         Dynamics new_word;
         for (int32_t i = 0; i <= k; ++i) {
             new_word.ans[i] = std::min(first.ans[i], second.ans[i]);
@@ -56,21 +56,21 @@ private:
         return new_word;
     }
 
-    Dynamics concatenate(Dynamics &&first, Dynamics &&second) {
+    Dynamics concatenate(Dynamics &&first, Dynamics &&second) { //operation '.'
         Dynamics new_word;
         int32_t min_word_first = first.ans[0];
-        for (int32_t i = 0; i <= k; ++i) {
+        for (int32_t i = 0; i <= k; ++i) { // I. get suffix from second, and minimal word from first
             if (min_word_first < INF && second.ans[i] < INF)
                 new_word.ans[i] = min_word_first + second.ans[i];
         }
-        for (int32_t i = 0; i <= k; ++i) {
+        for (int32_t i = 0; i <= k; ++i) { // II. second word - x^t, first - has suffix x^(k-t), t=x_word
             for (auto x_word: second.X_words) {
                 if (x_word <= i && first.ans[i - x_word] < INF) {
                     new_word.ans[i] = std::min(new_word.ans[i], first.ans[i - x_word] + x_word);
                 }
             }
         }
-        for (auto x_first: first.X_words) {
+        for (auto x_first: first.X_words) { // updating every variant of sum
             for (auto x_second: second.X_words) {
                 if (x_first + x_second <= k) {
                     new_word.X_words.insert(x_first + x_second);
@@ -82,14 +82,14 @@ private:
 
     Dynamics clini(Dynamics &&last) {
         Dynamics new_word;
-        new_word.X_words = all_sums(last.X_words, k);
+        new_word.X_words = all_sums(last.X_words, k); // all variants of suffixes
         new_word.ans[0] = 0; // empty word
-        for (auto x_word: new_word.X_words) {
+        for (auto x_word: new_word.X_words) { // suffix x^t contains at word x^x_word, x_word >= t
             for (int i = 0; i <= x_word; ++i) {
                 new_word.ans[i] = std::min(new_word.ans[i], x_word);
             }
         }
-        for(int i = 0; i <= k; ++i) {
+        for(int i = 0; i <= k; ++i) { // star contains one word
             new_word.ans[i] = std::min(new_word.ans[i], last.ans[i]);
         }
         for (int32_t i = 0; i <= k; ++i) { // updating ans[i]
