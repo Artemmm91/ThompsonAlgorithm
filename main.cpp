@@ -1,5 +1,5 @@
 #include <iostream>
-#include "thompson.h"
+#include "FSMTHompson.cpp"
 
 
 int main() {
@@ -7,19 +7,19 @@ int main() {
     int64_t e, a, b, c;
     std::cout << "Print number of vertices, edges, terminal vertices and symbols in alphabet:\n";
     std::cin >> n >> e >> terminals >> alphabet;
-    Thompson T(alphabet, n);
+    FSM::FiniteStateMachine fsm(alphabet, n);
     std::cout << "For every edge print start finish and symbol on edge (one):\n";
     for (int i = 0; i < e; ++i) {
         std::cin >> a >> b >> c;
-        T.add_edge(a, b, c);
+        fsm.add_edge(a, b, c);
     }
     std::cout << "Print terminal number's:\n";
     for (int i = 0; i < terminals; ++i) {
         std::cin >> a;
-        T.add_terminal(a);
+        fsm.add_terminal(a);
     }
-    T.iterate();
-    T.print_result();
+    auto new_fsm = FSM::thompson_algorithm(fsm);
+    new_fsm.print();
 }
 
 /*
@@ -49,4 +49,5 @@ Test:
 5 6 1
 6 5 2
 5
+
 */
